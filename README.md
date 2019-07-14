@@ -12,7 +12,31 @@ I used this for creating birthday invitations for my child.
 
 ## Example
 
-If you ahve the following image as `giraffe.png`:
+### Shape input as PNG
+If you have the following image as `giraffe.png`:
 
 ![blocky black-and-white giraffe](src/test/resources/giraffe.png)
 
+You can run `java -jar spell-labyrinth-assembly-1.0.jar --standalone --image src/test/resources/giraffe.png` and get [this pdf](examples/giraffe.pdf).
+
+![picture of pdf content](examples/giraffe-rendered.png)
+
+Note that you need a LaTeX installation for this to work. The image has to be black and white.
+
+### Text filling
+
+The commandline `java -jar spell-labyrinth-1.0.jar --fill --width 10 --height 10 --text "(0,0)THIS IS SOME RANDOM TEXT TO DEMONSTRATE TEXT FILLING INTO LABYRINTH(9,9)" --standalone` yields [this pdf](examples/with-text.pdf).
+
+![text-filled labyrinth](examples/with-text.png)
+
+You can add start and end coordinates to the given text.
+
+At the time of writing, I don't know whether this is mandatory. I also don't know if text filling can be combined with shape from image,
+but I think so. Be sure to place your coordinates within the image. There is no reasonable error reporting.
+If you have any problems with this program, you can file an issue.
+
+## Building
+
+To build this project, you need to install [SBT](https://www.scala-sbt.org/) or use any modern Scala IDE.
+
+The task `sbt assembly` will create a runnable jar. You can also download a binary from the releases page.

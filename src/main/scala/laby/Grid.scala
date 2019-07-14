@@ -12,7 +12,7 @@ object Grid {
   /** Calculate the position on the output grid for a node on the labyrinth grid. */
   def slotToCoord(n: Pos): NewPos = NewPos(n.x * 2 + 1, n.y * 2 + 1)
 
-  def asciiRenderer: Renderer[Rect,String] = new Renderer[Rect,String]{
+  object ASCIIRenderer extends Renderer[Rect,String]{
     override def render(topology: Rect, labels: Pos => Char, edges: Set[BiSet[Pos]]): String = {
 
       val result: Map[NewPos,Char] =
@@ -26,12 +26,7 @@ object Grid {
     }
   }
 
-  /* TODO
-   - draw border
-   - mark beginning node
-   */
-  def tikzRenderer: Renderer[Grid,String] = new Renderer[Grid,String]{
-
+  object TikzRenderer extends Renderer[Grid,String]{
     override def render(topology: Grid, labels: Pos => Char, edges: Set[BiSet[Pos]]): String = {
       def node(n: Pos, char: Char, style: Option[String] = None): String = s"\\node${style.map{s => s"[$s]"}.getOrElse("")} at ${n.toPoint.flipy} {$char};"
       def closedEdge(e: BiSet[Pos]): String = {

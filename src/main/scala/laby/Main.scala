@@ -14,15 +14,15 @@ object Main {
     def length: Int = text.length
   }
 
-  case class Conf(topo: Either[Rect, FreeGrid] = Left(Rect()), paths: Seq[Path] = Seq(), maxTries: Int = 50, fillRandom: Boolean = false, standalone: Boolean = false, seed: Option[Long] = None) {
+  case class Conf(topo: Either[Rect, FreeGrid] = Left(Rect()), paths: Seq[Path] = Seq(), maxTries: Int = 50, fillRandom: Boolean = false, standalone: Boolean = false, seed: Long = Random.nextLong()) {
     def run(): Unit = {
       val preamble =
         "\\documentclass{article}\n\\usepackage[utf8]{inputenc}\n\\usepackage{tikz}\n\\begin{document}\n\\begin{tikzpicture}[scale=0.3,Border/.style={}, StartNode/.style={}]"
       val postamble =
         "\\end{tikzpicture}\n\\end{document}"
 
-      println(seed)
-      val rand: Random = seed.map(s => new Random(s)).getOrElse(Random.self)
+      println(s"Used random generator seed: $seed")
+      val rand: Random = new Random(seed)
 
       val graph: UGraph[Pos] = topo.fold(_.graph, _.graph)
       val pathLayout: Map[Path, Seq[Pos]] = paths.foldLeft(Map[Path,Seq[Pos]]()){case (visited, path) =>
@@ -38,18 +38,18 @@ object Main {
 
       val filled: Set[BiSet[Pos]] = spanningTrees(woPaths)
 
-      val posToChar =
+      val posToChar: Map[Pos, Char] =
         if(fillRandom) pathChars.withDefault(_ => ('A' + Random.nextInt(26)).toChar)
         else pathChars.withDefaultValue(' ')
 
-      val r = Grid.tikzRenderer.render(
+      val r: String = Grid.TikzRenderer.render(
         topo.fold(identity,identity),
         posToChar,
         filled ++ pathEdges
       )
-      val all = if(standalone) Seq(preamble, r, postamble).mkString("\n") else r
+      val all: String = if(standalone) Seq(preamble, r, postamble).mkString("\n") else r
 
-      val fo = new FileOutputStream("out.tex")
+      val fo: FileOutputStream = new FileOutputStream("out.tex")
       fo.write(all.getBytes)
       fo.close()
 
@@ -57,9 +57,6 @@ object Main {
         import sys.process._
         "latexmk -pdf out.tex" !
       }
-      //    val pol: Seq[(Int, Int)] = Topology.pathOfLength(grid,desiredLength, -2)
-      //    println(s"desired: $desiredLength, found: ${pol.size}")
-
     }
   }
 
@@ -77,20 +74,34 @@ object Main {
   }
 
   val parser: OptionParser[Conf] = new OptionParser[Conf]("maze-gen") {
-    opt[Int]("width").action{case (w,c) => c.copy(topo = c.topo match {
+    opt[Int]("width")
+      .text("width of rectangular labyrinth")
+      .action{case (w,c) => c.copy(topo = c.topo match {
       case Left(Rect(_, h)) => Left(Rect(w, h))
       case _ => Left(Rect(width = w))
     })}
-    opt[Int]("height").action{case (h,c) => c.copy(topo = c.topo match {
+    opt[Int]("height")
+      .text("height of rectangular labyrinth")
+      .action{case (h,c) => c.copy(topo = c.topo match {
       case Left(Rect(w, _)) => Left(Rect(w, h))
       case _ => Left(Rect(height = h))
     })}
-    opt[File]("image").action{case (f, c) => c.copy(topo = Right(FreeGrid.fromImage(f).get))}
+    opt[File]("image")
+      .text("use shape from this b/w image")
+      .action{case (f, c) => c.copy(topo = Right(FreeGrid.fromImage(f).get))}
 
-    opt[Path]("text").action{case (p,c) => c.copy(paths = c.paths :+ p)}
-    opt[Unit]("fill").action{case (_,c) => c.copy(fillRandom = true)}
-    opt[Unit]("standalone").action{case (_,c) => c.copy(standalone = true)}
-    opt[Long]("seed").action{case (l,c) => c.copy(seed = Some(l))}
+    opt[Path]("text")
+      .text("fill this text into the labyrinth")
+      .action{case (p,c) => c.copy(paths = c.paths :+ p)}
+    opt[Unit]("fill")
+      .text("fill the remaining labyrinth with random characters")
+      .action{case (_,c) => c.copy(fillRandom = true)}
+    opt[Unit]("standalone")
+      .text("compile to PDF using latexmk")
+      .action{case (_,c) => c.copy(standalone = true)}
+    opt[Long]("seed")
+      .text("random generator seed, use to get reproducible results")
+      .action{case (l,c) => c.copy(seed = l)}
   }
 
   def main(args: Array[String]): Unit = {

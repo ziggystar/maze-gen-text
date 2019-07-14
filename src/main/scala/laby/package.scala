@@ -45,7 +45,6 @@ package object laby {
   }
 
   def pathOfLength[N](_g: UGraph[N], start: N, end: N, length: Int, maxTries: Int = 10, random: Random = Random.self): Option[Seq[N]] = {
-    println(s"trying to find path of length: $length")
     val initialDistance: Double = {
       val d = new DijkstraShortestPath(_g)
       d.getPath(start,end).getLength.toDouble
@@ -72,7 +71,6 @@ package object laby {
             .map(_ :: path)
         case _ => None
       }.takeWhile(_.isDefined).toSeq.last.get.reverse
-      println(r.length)
       r
     }
     Iterator.continually(genOnePath()).take(maxTries).find(_.length >= length)
