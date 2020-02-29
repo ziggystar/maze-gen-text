@@ -38,8 +38,6 @@ If you have any problems with this program, you can file an issue.
 ## Downloading
 
 You can get a recent version from the [Releases Page](https://github.com/ziggystar/maze-gen-text/releases).
-
- - [Version 1.0](https://github.com/ziggystar/maze-gen-text/releases/download/v1.0/spell-labyrinth-1.0)
  
  To run this program, you'll need at least a JRE installed. [Link to Oracle Java](https://www.oracle.com/technetwork/java/javase/downloads/jre8-downloads-2133155.html)
 ## Building
