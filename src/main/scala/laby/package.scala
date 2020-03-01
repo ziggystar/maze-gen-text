@@ -20,15 +20,15 @@ package object laby {
 
   implicit class RichGraph[N](val g: UGraph[N]) extends AnyVal {
     def neighboursOf(n: N): Set[N] =
-      g.edgesOf(n).asScala.map { e =>
+      g.edgesOf(n).asScala.view.map { e =>
         val n1 = g.getEdgeSource(e)
         if (n1 != n) n1 else g.getEdgeTarget(e)
-      }(collection.breakOut)
+      }.to(Set)
 
     def nodes: Set[N] = g.vertexSet.asScala.toSet
 
     def edges: Set[BiSet[N]] =
-      g.edgeSet().asScala.map{e => BiSet(g.getEdgeSource(e), g.getEdgeTarget(e))}(collection.breakOut)
+      g.edgeSet().asScala.view.map{e => BiSet(g.getEdgeSource(e), g.getEdgeTarget(e))}.to(Set)
 
     def subgraph(verts: Set[N]): UGraph[N] = {
       val r = new SimpleGraph[N,DefaultEdge](classOf[DefaultEdge])

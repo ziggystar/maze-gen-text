@@ -31,7 +31,7 @@ object Main {
           visited + (path -> p)
       }
 
-      val pathEdges: Set[BiSet[Pos]] = pathLayout.values.flatMap { p => p.sliding(2).map(e => BiSet(e(0), e(1))) }(collection.breakOut)
+      val pathEdges: Set[BiSet[Pos]] = pathLayout.values.view.flatMap { p => p.sliding(2).map(e => BiSet(e(0), e(1))) }.to(Set)
 
       val pathChars: Map[Pos, Char] = pathLayout.map{case (p,layout) => layout.zip(p.text.padTo(layout.size,' ')).toMap}.foldLeft(Map[Pos,Char]())(_ ++ _)
       val woPaths = graph.subgraph(graph.nodes -- pathLayout.values.flatten.toSet)
