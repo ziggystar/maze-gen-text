@@ -11,3 +11,10 @@ libraryDependencies += "org.jgrapht" % "jgrapht-core" % "1.0.1"
 libraryDependencies += "com.github.scopt" %% "scopt" % "3.7.1"
 
 assemblyJarName in assembly := s"${name.value}-${version.value}"
+
+scalacOptions ++= Seq(
+  "-Xfatal-warnings", // New lines for each options
+  "-deprecation",
+  "-unchecked",
+  "-language:higherKinds"
+)

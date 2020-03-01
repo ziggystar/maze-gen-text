@@ -3,13 +3,14 @@ import org.jgrapht.alg.spanning.KruskalMinimumSpanningTree
 import org.jgrapht.graph.{DefaultEdge, SimpleGraph}
 import org.jgrapht.{Graphs, UndirectedGraph}
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.util.Random
 
 package object laby {
   def wheelOfFortune[N](xs: List[N], random: Random = Random.self)(weight: N => Double): N = {
+    @scala.annotation.tailrec
     def find(r: Double, s: List[N]): N = s match {
-      case h :: t if weight(h) > r => h
+      case h :: _ if weight(h) > r => h
       case h :: t => find(r - weight(h), t)
       case Nil => sys.error(s"oops: $xs; ${xs.map {weight}}")
     }
